@@ -49,6 +49,7 @@ public class HomeController {
         return "add";
     }
 
+    //TODO: add code inside of this method to select the employer object that has been chosen to be affiliated with the new job. You will need to select the employer using the request parameter you’ve added to the method.
     @PostMapping("add")
     public String processAddJobForm(@ModelAttribute @Valid Job newJob,
                                        Errors errors, Model model, @RequestParam int employerId) {

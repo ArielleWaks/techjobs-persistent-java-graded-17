@@ -12,7 +12,6 @@ public class Job extends AbstractEntity {
 
     @ManyToOne
     @NotNull(message = "Employer is required")
-    @JoinColumn(name = "employer_id")
     private Employer employer;
 
 
