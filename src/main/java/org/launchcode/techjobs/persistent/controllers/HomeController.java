@@ -1,7 +1,9 @@
 package org.launchcode.techjobs.persistent.controllers;
 
 import jakarta.validation.Valid;
+import org.launchcode.techjobs.persistent.models.Employer;
 import org.launchcode.techjobs.persistent.models.Job;
+import org.launchcode.techjobs.persistent.models.Skill;
 import org.launchcode.techjobs.persistent.models.data.EmployerRepository;
 import org.launchcode.techjobs.persistent.models.data.JobRepository;
 import org.launchcode.techjobs.persistent.models.data.SkillRepository;
@@ -22,13 +24,13 @@ import java.util.Optional;
 public class HomeController {
 
     @Autowired
-    private EmployerRepository employerRepository;
+    private EmployerRepository employerRepository; //private?
 
     @Autowired
-    private SkillRepository skillRepository;
+    private SkillRepository skillRepository; //private?
 
     @Autowired
-    private JobRepository jobRepository;
+    private JobRepository jobRepository; //private?
 
     @RequestMapping("/")
     public String index(Model model) {
@@ -49,18 +51,32 @@ public class HomeController {
         return "add";
     }
 
-    //TODO: add code inside of this method to select the employer object that has been chosen to be affiliated with the new job. You will need to select the employer using the request parameter you’ve added to the method.
     @PostMapping("add")
-    public String processAddJobForm(@ModelAttribute @Valid Job newJob,
-                                       Errors errors, Model model, @RequestParam int employerId) {
+    public String processAddJobForm(@ModelAttribute @Valid Job job,
+                                    Errors errors,
+                                    Model model,
+                                    @RequestParam int employerId,
+                                    @RequestParam List<Integer> skills) {
+
 
         if (errors.hasErrors()) {
 	        model.addAttribute("title", "Add Job");
             return "add";
         }
 
-        model.addAttribute("employer", employerRepository.findById(employerId));
-        jobRepository.save(newJob);
+        Optional<Employer> employerResult = employerRepository.findById(employerId);
+
+        if (employerResult.isPresent()) {
+            Employer employer = employerResult.get();
+            job.setEmployer(employer);
+        }
+
+        List<Skill> skillObjs = (List<Skill>) skillRepository.findAllById(skills);
+        job.setSkills(skillObjs);
+
+
+//        model.addAttribute("employer", employerRepository.findById(employerId));
+        jobRepository.save(job);
 
         return "redirect:";
     }
@@ -68,7 +84,18 @@ public class HomeController {
     @GetMapping("view/{jobId}")
     public String displayViewJob(Model model, @PathVariable int jobId) {
 
-            return "view";
+        Optional<Job> result = jobRepository.findById(jobId);
+
+        if (result.isEmpty()) {
+            model.addAttribute("title", "Invalid Job ID: " + jobId);
+        } else {
+            Job job = result.get();
+            model.addAttribute("title", job.getName() + " Details");
+            model.addAttribute("job", job);
+        }
+
+        return "view";
+
     }
 
 }
