@@ -24,13 +24,13 @@ import java.util.Optional;
 public class HomeController {
 
     @Autowired
-    private EmployerRepository employerRepository; //private?
+    private EmployerRepository employerRepository;
 
     @Autowired
-    private SkillRepository skillRepository; //private?
+    private SkillRepository skillRepository;
 
     @Autowired
-    private JobRepository jobRepository; //private?
+    private JobRepository jobRepository;
 
     @RequestMapping("/")
     public String index(Model model) {
@@ -74,8 +74,6 @@ public class HomeController {
         List<Skill> skillObjs = (List<Skill>) skillRepository.findAllById(skills);
         job.setSkills(skillObjs);
 
-
-//        model.addAttribute("employer", employerRepository.findById(employerId));
         jobRepository.save(job);
 
         return "redirect:";
